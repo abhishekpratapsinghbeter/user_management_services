@@ -19,7 +19,7 @@ router4.post('/addstudent',authMiddleware(['Admin']), async (req, res) => {
         const savedstudent = await newstudent.save();
 
         res.status(201).json(savedstudent._id);
-        await axios.post('http://localhost:5003/log', { level: 'info', message: `New Student has been added` });
+        await axios.post('https://logging-services.onrender.com/log', { level: 'info', message: `New Student has been added` });
         
     } catch (error) {
         console.error(error);

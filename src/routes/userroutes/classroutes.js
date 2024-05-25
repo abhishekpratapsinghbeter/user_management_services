@@ -51,7 +51,7 @@ router1.post('/addClass', authMiddleware(['Admin']) , async (req, res) => {
         });
 
         res.status(201).json(newClass);
-        await axios.post('http://localhost:5003/log', { level: 'info', message: `New class has been added` });
+        await axios.post('https://logging-services.onrender.com/log', { level: 'info', message: `New class has been added` });
         
     } catch (error) {
         console.error(error);

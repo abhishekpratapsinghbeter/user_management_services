@@ -21,7 +21,7 @@ router2.post('/addSubject', authMiddleware(['Admin']), async (req, res) => {
             subject_department,
         });
         res.status(201).json(newSubject);
-        await axios.post('http://localhost:5003/log', { level: 'info', message: `New Subject has been added` });
+        await axios.post('https://logging-services.onrender.com/log', { level: 'info', message: `New Subject has been added` });
         
     } catch (error) {
         console.error(error);
