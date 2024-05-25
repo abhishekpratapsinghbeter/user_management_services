@@ -6,21 +6,31 @@ const authMiddleware = require('../../middleware/validation');
 
 
 //####################################################################################### student Registeration #####################################################################################################################################################################################
-router4.post('/addstudent',authMiddleware(['Admin']), async (req, res) => {
-    const {student_cllgid,student_regId,student_name,student_branch,student_section,student_batch,student_address,student_rollno,student_dob,student_number,student_parentsnumber,student_mothername,student_fathername,student_category,student_gender,student_photo,student_course,semester,student_mail} = req.body;
-    const role = "student"
+router4.post('/addstudent', authMiddleware(['Admin']), async (req, res) => {
+    const { student_cllgid, student_photo, ...otherStudentData } = req.body;
+    const role = "student";
+
     try {
-        // Create a new student instance
-        const newstudent = new Student({
-            student_cllgid,student_regId,student_name,student_branch,student_section,student_batch,student_address,student_rollno,student_dob,student_number,student_parentsnumber,student_mothername,student_fathername,student_category,student_gender,student_photo,student_course,semester,role,student_mail
+        const newStudent = new Student({
+            student_cllgid,
+            student_photo,
+            ...otherStudentData,
+            role
         });
 
-        // Save the new student to the database
-        const savedstudent = await newstudent.save();
+        const savedStudent = await newStudent.save();
 
-        res.status(201).json(savedstudent._id);
-        await axios.post('https://logging-services.onrender.com/log', { level: 'info', message: `New Student has been added` });
-        
+        await axios.post('https://face-services.onrender.com/user-faceid', {
+            userId: savedStudent.student_cllgid,
+            imageData: savedStudent.student_photo
+        });
+
+        await axios.post('https://logging-services.onrender.com/log', {
+            level: 'info',
+            message: `New Student ${savedStudent.student_cllgid} has been added`
+        });
+
+        res.status(201).json(savedStudent._id);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to add student" });
