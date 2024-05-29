@@ -8,7 +8,7 @@ const axios = require('axios')
 //####################################################################################### student Registeration #####################################################################################################################################################################################
 router4.post('/addstudent', authMiddleware(['Admin']), async (req, res) => {
     const { student_cllgid, student_photo, ...otherStudentData } = req.body;
-    const role = "student";
+    const role = "Student";
 
     try {
         const newStudent = new Student({
