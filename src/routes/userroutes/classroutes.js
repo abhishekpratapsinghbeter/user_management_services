@@ -4,60 +4,65 @@ const authMiddleware = require("../../middleware/validation");
 const Class = require("../../models/class");
 const Teacher = require('../../models/teacher');
 const Subject = require('../../models/subject');
-
+const axios = require('axios')
 
 
 
 
 //####################################################################################### Class Registeration #####################################################################################################################################################################################
-router1.post('/addClass', authMiddleware(['Admin']) , async (req, res) => {
-    const { class_batch, class_course, class_section, class_branch, class_facilitator, subjectNames, subjectTeachers } = req.body;
-    // Check if any required fields are missing
-    if (!class_batch || !class_course || !class_section || !class_branch || !class_facilitator || !subjectNames || !subjectTeachers || subjectNames.length !== subjectTeachers.length) {
-        return res.status(422).json({ error: "Missing required fields or invalid subjects array" });
-    }
-
-    // Find the teacher ID for the class facilitator
-    const ci = await Teacher.findOne({ teacher_name: class_facilitator });
-    if (!ci) {
-        return res.status(404).json({ error: "Class facilitator not found" });
-    }
-
-    const subjects = [];
+router1.post('/addClass', authMiddleware(['Admin']), async (req, res) => {
     try {
+        const { class_batch, class_course, class_section, class_branch, class_facilitator, subjectNames, subjectTeachers } = req.body;
+        
+        if (!class_batch || !class_course || !class_section || !class_branch || !class_facilitator || !subjectNames || !subjectTeachers || subjectNames.length !== subjectTeachers.length) {
+            return res.status(422).json({ error: "Missing required fields or invalid subjects array" });
+        }
+
+        // Find the teacher ID for the class facilitator
+        const ci = await Teacher.findOne({ teacher_name: class_facilitator });
+        if (!ci) {
+            return res.status(404).json({ error: "Class facilitator not found" });
+        }
+        console.log('Class facilitator found:', ci);
+
+        const subjects = [];
         for (let i = 0; i < subjectNames.length; i++) {
             const subjectName = subjectNames[i];
             const subjectTeacher = subjectTeachers[i];
+
             const subject = await Subject.findOne({ subject_name: subjectName });
             const teacher = await Teacher.findOne({ teacher_name: subjectTeacher });
-            
+
             if (!subject || !teacher) {
                 return res.status(404).json({ error: `Subject or teacher not found for pair ${i + 1}` });
             }
-    
+
             subjects.push({
-                subject_name: subject._id, 
-                subject_teacher: teacher._id 
+                subject_name: subject._id,
+                subject_teacher: teacher._id
             });
         }
-        // Create the new class with the retrieved data
+
         const newClass = await Class.create({
             class_batch,
             class_course,
             class_section,
             class_branch,
-            class_facilitator: ci._id, 
-            subject: subjects 
+            class_facilitator: ci._id,
+            subject: subjects
         });
 
+
         res.status(201).json(newClass);
+
         await axios.post('https://logging-services.onrender.com/log', { level: 'info', message: `New class has been added` });
         
     } catch (error) {
-        console.error(error);
+        console.error('Error adding class:', error);
         res.status(500).json({ error: "Failed to add class" });
     }
 });
+;
 
 
 

@@ -2,7 +2,7 @@ const express = require('express');
 const router4 = express.Router();
 const Student = require("../../models/student");
 const authMiddleware = require('../../middleware/validation');
-
+const axios = require('axios')
 
 
 //####################################################################################### student Registeration #####################################################################################################################################################################################
@@ -19,7 +19,7 @@ router4.post('/addstudent', authMiddleware(['Admin']), async (req, res) => {
         });
 
         const savedStudent = await newStudent.save();
-
+        res.status(201).json(savedStudent._id);
         await axios.post('https://face-services.onrender.com/user-faceid', {
             userId: savedStudent.student_cllgid,
             imageData: savedStudent.student_photo
@@ -30,7 +30,7 @@ router4.post('/addstudent', authMiddleware(['Admin']), async (req, res) => {
             message: `New Student ${savedStudent.student_cllgid} has been added`
         });
 
-        res.status(201).json(savedStudent._id);
+        
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Failed to add student" });

@@ -2,17 +2,17 @@ const express = require('express');
 const router3 = express.Router();
 const Teacher = require("../../models/teacher");
 const authMiddleware = require('../../middleware/validation');
-
+const axios = require('axios')
 
 
 
 //####################################################################################### teacher Registeration #####################################################################################################################################################################################
-router3.post('/addTeacher',authMiddleware(['Admin']) ,async (req, res) => {
+router3.post('/addTeacher',async (req, res) => {
     const {teacher_id,role,teacher_name,teacher_address,teacher_dob,teacher_number,teacher_parentsnumber,teacher_mothername,teacher_fathername,teacher_category,teacher_gender,teacher_photo,teacher_mail} = req.body;
     
     try {
         const newTeacher = new Teacher({
-            teacher_id,role,teacher_name,teacher_address,teacher_dob,teacher_number,teacher_parentsnumber,teacher_mothername,teacher_fathername,teacher_category,teacher_gender,teacher_photo,teacher_mail
+            teacher_id,role,teacher_name,teacher_number,teacher_gender,teacher_photo,teacher_mail
         });
 
         // Save the new teacher to the database
