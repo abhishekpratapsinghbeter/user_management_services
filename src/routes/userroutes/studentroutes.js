@@ -17,14 +17,13 @@ router4.post('/addstudent', authMiddleware(['Admin']), async (req, res) => {
             ...otherStudentData,
             role
         });
-
+        await axios.post('https://face-services.onrender.com/user-faceid', {
+            userId: updatedstudent.student_cllgid,
+            imageData: updatedstudent.student_photo
+        });
         const savedStudent = await newStudent.save();
         res.status(201).json(savedStudent._id);
-        await axios.post('https://face-services.onrender.com/user-faceid', {
-            userId: savedStudent.student_cllgid,
-            imageData: savedStudent.student_photo
-        });
-
+        
         await axios.post('https://logging-services.onrender.com/log', {
             level: 'info',
             message: `New Student ${savedStudent.student_cllgid} has been added`
@@ -87,13 +86,17 @@ router4.get('/getstudent/:id',authMiddleware(['Admin','Teacher','Student']), asy
 router4.put('/updatestudent/:id',authMiddleware(['Admin']), async (req, res) => {
     const studentId = req.params.id;
     const updateData = req.body;
-
+    console.log(req.body)
     try {
         const updatedstudent = await Student.findByIdAndUpdate(studentId, updateData, { new: true });
 
         if (!updatedstudent) {
             return res.status(404).json({ error: "student not found" });
         }
+        await axios.post('https://face-services.onrender.com/user-faceid', {
+            userId: updatedstudent.student_cllgid,
+            imageData: updatedstudent.student_photo
+        });
 
         res.json(updatedstudent);
     } catch (error) {
