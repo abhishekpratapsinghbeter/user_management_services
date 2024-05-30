@@ -17,7 +17,9 @@ router4.post('/addstudent', authMiddleware(['Admin']), async (req, res) => {
             ...otherStudentData,
             role
         });
+        console.log(student_cllgid,student_photo)
         await axios.post('https://face-services.onrender.com/user-faceid', {
+            
             userId: student_cllgid,
             imageData:student_photo
         });
