@@ -18,12 +18,13 @@ router4.post('/addstudent', authMiddleware(['Admin']), async (req, res) => {
             role
         });
         console.log(student_cllgid,student_photo)
-        await axios.post('https://face-services.onrender.com/user-faceid', {
-            
-            userId: student_cllgid,
-            imageData:student_photo
-        });
+        
         const savedStudent = await newStudent.save();
+        await axios.post('http://localhost:5002/user-faceid1', {
+            
+            userId: savedStudent._id,
+            imageData:savedStudent.student_photo
+        });
         res.status(201).json(savedStudent._id);
         
         await axios.post('https://logging-services.onrender.com/log', {
